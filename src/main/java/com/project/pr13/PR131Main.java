@@ -95,25 +95,75 @@ public class PR131Main {
      * @return Document XML creat o null en cas d'error.
      */
     private static Document construirDocument() {
+        Document doc = null;
         try {
             DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
             DocumentBuilder db = dbf.newDocumentBuilder();
-            Document doc = db.newDocument();
+            doc = db.newDocument();
+
+            //node arrel
             Element eroot = doc.createElement("biblioteca");
-            Element ellibre = doc.createElement("llibre");
+
+            //node pare
+            Element eLlibre = doc.createElement("llibre");
+
+            //creem id
             Attr allibre = doc.createAttribute("id");
+
+            //asignem ID
             allibre.setValue("002");
-            Element etitol = doc.createElement("titol");
-            Text ttitol = doc.createTextNode("El juego de Ender");
 
+            //creem fills
+            Element eTitol = doc.createElement("titol");
+            Text tTitol = doc.createTextNode("El juego de Ender");
+            Element eAutor = doc.createElement("autor");
+            Text tAutor = doc.createTextNode("Orson Scott Card");
+            Element eAny = doc.createElement("anyPublicacio");
+            Text tAny = doc.createTextNode("1985");
+            Element eEditorial = doc.createElement("editorial");
+            Text tEditorial = doc.createTextNode("Tor Books");
+            Element eGenere = doc.createElement("genere");
+            Text tGenere = doc.createTextNode("Ciencia ficció");
+            Element ePagines = doc.createElement("pagines");
+            Text tPagines = doc.createTextNode("376");
+            Element eDisponible = doc.createElement("disponible");
+            Text tDisponible = doc.createTextNode("True");
 
-
-            //afegim
+            //afegim root
             doc.appendChild(eroot);
+
+            //fem el pare
+            eLlibre.setAttributeNode(allibre);
+            eroot.appendChild(eLlibre);
+
+            //fem els fills
+            eTitol.appendChild(tTitol);
+            eLlibre.appendChild(eTitol);
+
+            eAutor.appendChild(tAutor);
+            eLlibre.appendChild(eAutor);
+
+            eAny.appendChild(tAny);
+            eLlibre.appendChild(eAny);
+
+            eEditorial.appendChild(tEditorial);
+            eLlibre.appendChild(eEditorial);
+
+            eGenere.appendChild(tGenere);
+            eLlibre.appendChild(eGenere);
+
+            ePagines.appendChild(tPagines);
+            eLlibre.appendChild(ePagines);
+
+            eDisponible.appendChild(tDisponible);
+            eLlibre.appendChild(eDisponible);
+            return doc;
+
         } catch (ParserConfigurationException e) {
             throw new RuntimeException(e);
+
         }
-        return null; // Substitueix pel teu
+
     }
 
     /**
