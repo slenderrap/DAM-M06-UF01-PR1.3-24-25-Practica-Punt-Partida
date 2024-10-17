@@ -1,10 +1,13 @@
 package com.project.pr13;
 
+import org.w3c.dom.Attr;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
+import org.w3c.dom.Text;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.*;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
@@ -92,8 +95,25 @@ public class PR131Main {
      * @return Document XML creat o null en cas d'error.
      */
     private static Document construirDocument() {
-        // *************** CODI PRÀCTICA **********************/
-       return null; // Substitueix pel teu
+        try {
+            DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+            DocumentBuilder db = dbf.newDocumentBuilder();
+            Document doc = db.newDocument();
+            Element eroot = doc.createElement("biblioteca");
+            Element ellibre = doc.createElement("llibre");
+            Attr allibre = doc.createAttribute("id");
+            allibre.setValue("002");
+            Element etitol = doc.createElement("titol");
+            Text ttitol = doc.createTextNode("El juego de Ender");
+
+
+
+            //afegim
+            doc.appendChild(eroot);
+        } catch (ParserConfigurationException e) {
+            throw new RuntimeException(e);
+        }
+        return null; // Substitueix pel teu
     }
 
     /**

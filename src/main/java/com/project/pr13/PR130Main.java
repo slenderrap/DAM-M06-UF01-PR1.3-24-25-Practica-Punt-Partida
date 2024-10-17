@@ -1,14 +1,19 @@
 package com.project.pr13;
 
+import com.project.excepcions.IOFitxerExcepcio;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
+import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 import com.project.pr13.format.PersonaFormatter;
+import org.xml.sax.SAXException;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
 import java.io.File;
+import java.io.IOException;
 import java.io.InputStream;
 
 /**
@@ -53,19 +58,53 @@ public class PR130Main {
         Document doc = parseXML(inputFile);
         if (doc != null) {
             NodeList persones = doc.getElementsByTagName("persona");
-            // imprimirCapçaleres();
-            // imprimirDadesPersones(persones);
+            imprimirCapçaleres();
+            imprimirDadesPersones(persones);
         }
     }
 
     /**
      * Llegeix un fitxer XML i el converteix en un objecte Document.
-     * 
+     *
      * @param inputFile Fitxer XML a llegir.
      * @return Document XML carregat o null si hi ha hagut un error en la lectura.
      */
     public static Document parseXML(File inputFile) {
-        // *************** CODI PRÀCTICA **********************/
-        return null; // Substitueix pel teu        
+        DocumentBuilder db = null;
+        try {
+            if (!inputFile.exists()){
+                throw new IOFitxerExcepcio("Error al llegir el fitxer");
+
+            }else {
+                DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+                db = dbf.newDocumentBuilder();
+            }
+        } catch (IOFitxerExcepcio | ParserConfigurationException e) {
+            throw new RuntimeException(e);
+        }
+        try {
+            return db.parse(inputFile); // Substitueix pel teu
+        } catch (SAXException | IOException e) {
+
+            throw new RuntimeException(e);
+        }
+    }
+    public static void imprimirCapçaleres(){
+        System.out.printf("%-10s %-14s %-8s %-10s%n", "Nom", "Cognom", "Edat", "Ciutat");
+        System.out.printf("%-10s %-14s %-8s %-10s%n", "-".repeat(10), "-".repeat(14), "-".repeat(8), "-".repeat(10));
+
+    }
+    public void imprimirDadesPersones(NodeList persones){
+        for (int i =0;i<persones.getLength();i++){
+            Element persona = (Element) persones.item(i);
+            String nom = persona.getElementsByTagName("nom").item(0).getTextContent();
+            String cognom = persona.getElementsByTagName("cognom").item(0).getTextContent();
+            String edat = persona.getElementsByTagName("edat").item(0).getTextContent();
+            String ciutat = persona.getElementsByTagName("ciutat").item(0).getTextContent();
+
+            String output = String.format("%-10s %-14s %-8s %-10s%n",nom,cognom,edat,ciutat);
+
+            System.out.println(output);
+        }
     }
 }
