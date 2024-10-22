@@ -1,9 +1,6 @@
 package com.project.pr13;
 
-import org.w3c.dom.Attr;
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import org.w3c.dom.Text;
+import org.w3c.dom.*;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -12,6 +9,10 @@ import javax.xml.transform.*;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 import java.io.File;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.util.Properties;
 
 /**
  * Classe principal que crea un document XML amb informació de llibres i el guarda en un fitxer.
@@ -111,59 +112,57 @@ public class PR131Main {
             Attr allibre = doc.createAttribute("id");
 
             //asignem ID
-            allibre.setValue("002");
+            allibre.setValue("001");
 
             //creem fills
             Element eTitol = doc.createElement("titol");
-            Text tTitol = doc.createTextNode("El juego de Ender");
-            Element eAutor = doc.createElement("autor");
-            Text tAutor = doc.createTextNode("Orson Scott Card");
-            Element eAny = doc.createElement("anyPublicacio");
-            Text tAny = doc.createTextNode("1985");
-            Element eEditorial = doc.createElement("editorial");
-            Text tEditorial = doc.createTextNode("Tor Books");
-            Element eGenere = doc.createElement("genere");
-            Text tGenere = doc.createTextNode("Ciencia ficció");
-            Element ePagines = doc.createElement("pagines");
-            Text tPagines = doc.createTextNode("376");
-            Element eDisponible = doc.createElement("disponible");
-            Text tDisponible = doc.createTextNode("True");
+            eTitol.setTextContent("El viatge dels venturons");
 
-            //afegim root
-            doc.appendChild(eroot);
+            Element eAutor = doc.createElement("autor");
+            eAutor.setTextContent("Joan Pla");
+            Element eAny = doc.createElement("anyPublicacio");
+            eAny.setTextContent("1998");
+            Element eEditorial = doc.createElement("editorial");
+            eEditorial.setTextContent("Edicions Mar");
+            Element eGenere = doc.createElement("genere");
+            eGenere.setTextContent("Aventura");
+            Element ePagines = doc.createElement("pagines");
+            ePagines.setTextContent("320");
+            Element eDisponible = doc.createElement("disponible");
+            eDisponible.setTextContent("true");
+
+
 
             //fem el pare
             eLlibre.setAttributeNode(allibre);
-            eroot.appendChild(eLlibre);
 
             //fem els fills
-            eTitol.appendChild(tTitol);
             eLlibre.appendChild(eTitol);
 
-            eAutor.appendChild(tAutor);
             eLlibre.appendChild(eAutor);
 
-            eAny.appendChild(tAny);
             eLlibre.appendChild(eAny);
 
-            eEditorial.appendChild(tEditorial);
             eLlibre.appendChild(eEditorial);
 
-            eGenere.appendChild(tGenere);
             eLlibre.appendChild(eGenere);
 
-            ePagines.appendChild(tPagines);
             eLlibre.appendChild(ePagines);
 
-            eDisponible.appendChild(tDisponible);
             eLlibre.appendChild(eDisponible);
+
+
+            eroot.appendChild(eLlibre);
+            //afegim root
+            doc.appendChild(eroot);
             return doc;
 
         } catch (ParserConfigurationException e) {
-            throw new RuntimeException(e);
+            e.printStackTrace();
 
         }
 
+        return doc;
     }
 
     /**
@@ -173,6 +172,34 @@ public class PR131Main {
      * @param fitxerSortida Fitxer de sortida on es guardarà el document.
      */
     private static void guardarDocument(Document doc, File fitxerSortida) {
-        // *************** CODI PRÀCTICA **********************/
+        if (!fitxerSortida.exists()){
+            try {
+                if (fitxerSortida.createNewFile()){
+                    System.out.println("s'ha generat correctament l'arxiu");
+                }
+                else {
+
+                    System.out.println("No s'ha pogut generar");
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+        try{
+
+            TransformerFactory tf = TransformerFactory.newInstance();
+            Transformer t = tf.newTransformer();
+            t.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION,"yes");
+            t.setOutputProperty(OutputKeys.INDENT,"yes");
+
+
+            DOMSource source = new DOMSource(doc);
+            StreamResult result = new StreamResult(new FileWriter(fitxerSortida,false));
+            t.transform(source,result);
+            System.out.println("S'ha guardat l'arxiu");
+
+        } catch (TransformerException | IOException e) {
+            e.printStackTrace();
+        }
     }
 }

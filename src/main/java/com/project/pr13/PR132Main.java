@@ -16,6 +16,7 @@ import javax.xml.xpath.XPathFactory;
 import javax.xml.transform.*;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
+import java.net.IDN;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
@@ -138,8 +139,30 @@ public class PR132Main {
      * @return Llista amb la informació dels cursos (ID, tutor, nombre d'alumnes).
      */
     public List<List<String>> llistarCursos() {
-        // *************** CODI PRÀCTICA **********************/
-        return null; // Substitueix pel teu
+
+        List<List<String>> llista = new ArrayList<>();
+        Document doc =carregarDocumentXML(xmlFilePath);
+        String resultat="";
+        XPath xpath = XPathFactory.newInstance().newXPath();
+        String query = "/cursos/curs";
+        try {
+            NodeList resultats = (NodeList) xpath.compile(query).evaluate(doc,XPathConstants.NODESET);
+            for (int i=0;i< resultats.getLength();i++){
+                ArrayList<String> curs = new ArrayList<>();
+                Element el = (Element) resultats.item(i);
+                curs.add(el.getAttribute("id"));
+
+                curs.add(el.getElementsByTagName("tutor").item(0).getTextContent());
+
+                curs.add(String.valueOf(el.getElementsByTagName("alumnes").item(0).getChildNodes().getLength()));
+
+                llista.add(curs);
+            }
+            System.out.println(resultat);
+        } catch (XPathExpressionException e) {
+            throw new RuntimeException(e);
+        }
+        return llista;
     }
 
     /**
@@ -159,8 +182,35 @@ public class PR132Main {
      * @return Llista amb la informació dels mòduls (ID, títol).
      */
     public List<List<String>> mostrarModuls(String idCurs) {
-        // *************** CODI PRÀCTICA **********************/
-        return null; // Substitueix pel teu
+        List<List<String>> llistaCursos = new ArrayList<>();
+        String query = "/cursos/curs[@id='"+ idCurs +"']";
+        Document doc = carregarDocumentXML(xmlFilePath);
+        XPath xpath = XPathFactory.newInstance().newXPath();
+        try{
+            NodeList resultats = (NodeList) xpath.compile(query).evaluate(doc,XPathConstants.NODESET);
+
+            for (int i =0; i<resultats.getLength();i++){
+
+                Element el = ((Element) resultats.item(i));
+                NodeList modul = el.getElementsByTagName("modul");
+                for (int j =0; j<modul.getLength();j++){
+                    List<String> moduls = new ArrayList<>();
+                    Element elModul = (Element) modul.item(j);
+                    moduls.add(elModul.getAttribute("id"));
+                    moduls.add(elModul.getElementsByTagName("titol").item(0).getTextContent());
+                    llistaCursos.add(moduls);
+                }
+            }
+
+
+
+
+        } catch (XPathExpressionException e) {
+            throw new RuntimeException(e);
+        }
+
+
+        return llistaCursos; // Substitueix pel teu
     }
 
     /**
@@ -180,8 +230,21 @@ public class PR132Main {
      * @return Llista amb els noms dels alumnes.
      */
     public List<String> llistarAlumnes(String idCurs) {
-        // *************** CODI PRÀCTICA **********************/
-        return null; // Substitueix pel teu
+        List<String> llistaAlumn = new ArrayList<>();
+        String query = "/cursos/curs[@id='"+ idCurs +"']/alumnes/alumne";
+        Document doc = carregarDocumentXML(xmlFilePath);
+        XPath xpath = XPathFactory.newInstance().newXPath();
+        try {
+            NodeList resultats = (NodeList) xpath.compile(query).evaluate(doc,XPathConstants.NODESET);
+            for (int i =0 ; i<resultats.getLength();i++){
+                Node alumne = resultats.item(i);
+                llistaAlumn.add(alumne.getTextContent());
+
+            }
+        } catch (XPathExpressionException e) {
+            throw new RuntimeException(e);
+        }
+        return llistaAlumn;
     }
 
     /**
@@ -201,7 +264,23 @@ public class PR132Main {
      * @param nomAlumne Nom de l'alumne a afegir.
      */
     public void afegirAlumne(String idCurs, String nomAlumne) {
-        // *************** CODI PRÀCTICA **********************/
+        Document doc = carregarDocumentXML(xmlFilePath);
+        XPath xPath = XPathFactory.newDefaultInstance().newXPath();
+        String query = "/cursos/curs[@id='"+idCurs+"']/alumnes";
+        NodeList llistaAlumnes;
+        try {
+            llistaAlumnes = (NodeList) xPath.compile(query).evaluate(doc,XPathConstants.NODESET);
+            Node alumne = llistaAlumnes.item(0);
+            Element eAlumne = (Element) alumne;
+            Element eNouAlumne = doc.createElement("alumne");
+            eNouAlumne.setTextContent(nomAlumne);
+            eAlumne.appendChild(eNouAlumne);
+            guardarDocumentXML(doc);
+
+        } catch (XPathExpressionException e) {
+            throw new RuntimeException(e);
+        }
+
     }
 
     /**
@@ -211,7 +290,22 @@ public class PR132Main {
      * @param nomAlumne Nom de l'alumne a eliminar.
      */
     public void eliminarAlumne(String idCurs, String nomAlumne) {
-        // *************** CODI PRÀCTICA **********************/
+        Document doc = carregarDocumentXML(xmlFilePath);
+        XPath xpath = XPathFactory.newInstance().newXPath();
+        String query = "/cursos/curs[@id='"+idCurs+"']/alumnes/alumne[text()='"+nomAlumne+"']";
+        NodeList executor;
+        try {
+            executor = (NodeList) xpath.compile(query).evaluate(doc,XPathConstants.NODESET);
+            Node alumne = executor.item(0);
+
+            if (alumne!=null){
+                alumne.getParentNode().removeChild(alumne);
+            }
+            guardarDocumentXML(doc);
+        } catch (XPathExpressionException e) {
+            throw new RuntimeException(e);
+        }
+
     }
 
     /**
